@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Objects;
 
 public class Entity {
 
@@ -27,6 +28,8 @@ public class Entity {
     public boolean invincible = false;
     public boolean collision = false; // for objects
     public boolean attacking = false;
+    public boolean alive = true;
+    public boolean dying = false;
 
     public Rectangle solidArea = new Rectangle(0, 0, 48, 48);
     public Rectangle attackArea = new Rectangle(0,0,0,0);
@@ -44,6 +47,7 @@ public class Entity {
     public int actionLockCounter = 0;
     public int invincibleCounter = 0;
     public int spriteCounter = 0;
+    int dyingCounter = 0;
 
 
     public Entity(GamePanel gp) {
@@ -95,6 +99,7 @@ public class Entity {
 
             if(gp.player.invincible == false) {
                 // we can give damage
+                gp.playSoundEffect(6);
                 gp.player.life -= 1;
                 gp.player.invincible = true;
             }
@@ -185,10 +190,57 @@ public class Entity {
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
             }
 
+            if(dying == true) {
+                dyingAnimation(g2);
+            }
+
             g2.drawImage(image, screenX, screenY, null);
 
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
         }
+    }
+
+    // every 5 frames changing the alpha of the monster for a death effect
+    public void dyingAnimation(Graphics2D g2) {
+
+        dyingCounter++;
+
+        int i = 5;
+
+        if(dyingCounter <= i) {
+            changeAlpha(g2, 0);
+        }
+        if(dyingCounter > (i) && dyingCounter <= (i * 2)) {
+            changeAlpha(g2, 1);
+        }
+        if(dyingCounter > (i * 2) && dyingCounter <= (i * 3)) {
+            changeAlpha(g2, 0);
+        }
+        if(dyingCounter > (i * 3) && dyingCounter <= (i * 4)) {
+            changeAlpha(g2, 1);
+        }
+        if(dyingCounter > (i * 4) && dyingCounter <= (i * 5)) {
+            changeAlpha(g2, 0);
+        }
+        if(dyingCounter > (i * 5) && dyingCounter <= (i * 6)) {
+            changeAlpha(g2, 1);
+        }
+        if(dyingCounter > (i * 6) && dyingCounter <= (i * 7)) {
+            changeAlpha(g2, 0);
+        }
+        if(dyingCounter > (i * 7) && dyingCounter <= (i * 8)) {
+            changeAlpha(g2, 1);
+        }
+        if(dyingCounter > i * 8) {
+            dying = false;
+            alive = false;
+        }
+    }
+
+    // creating a method to change alpha so that we don't have to call the same function again and again
+    public void changeAlpha(Graphics2D g2, float alphaValue) {
+
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaValue));
     }
 
     // method to read the entity images

@@ -2,7 +2,6 @@ package main;
 
 import Monster.GreenSlime;
 import entity.NPC_OldMan;
-import objects.Door;
 
 public class AssetSetter {
 
