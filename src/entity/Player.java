@@ -12,7 +12,7 @@ public class Player extends Entity{
 
     public final int screenX;
     public final int screenY;
-
+    public boolean attackCanceled = false;
 
     //constructor
     public Player(GamePanel gp, KeyHandler keyH) {
@@ -83,7 +83,6 @@ public class Player extends Entity{
     public void update() {
 
         if(attacking == true) {
-
             attacking();
         }
         else if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed || keyH.enterPressed) {
@@ -128,6 +127,13 @@ public class Player extends Entity{
                 }
             }
 
+            if(keyH.enterPressed == true && attackCanceled == false) {
+                gp.playSoundEffect(7);
+                attacking = true;
+                spriteCounter = 0;
+            }
+
+            attackCanceled = false;
             keyH.enterPressed = false;
 
             spriteCounter++;
@@ -190,13 +196,14 @@ public class Player extends Entity{
             solidArea.width = solidAreaWidth;
             solidArea.height = solidAreaHeight;
         }
+
         if(spriteCounter > 25) {
             spriteNum = 1;
             spriteCounter = 0;
             attacking = false;
         }
-
     }
+
     // picks up objects
     public void pickUpObject(int i) {
 
@@ -208,12 +215,9 @@ public class Player extends Entity{
         if(keyH.enterPressed) {
 
             if(i != 999) {
+                attackCanceled = true;
                 gp.gameState = gp.dialogueState;
                 gp.npc[i].speak();
-            }
-            else {
-                gp.playSoundEffect(7);
-                attacking = true;
             }
         }
     }
