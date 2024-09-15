@@ -13,7 +13,7 @@ public class GreenSlime extends Entity {
         type = 2;
         name = "Green Slime";
         speed = 1;
-        maxLife = 4;
+        maxLife = 6;
         life = maxLife;
 
         solidArea.x = 3;
@@ -63,5 +63,10 @@ public class GreenSlime extends Entity {
         }
     }
 
+    // setting monster's reaction to damage given by player
+    public void damageReaction() {
 
+        actionLockCounter = 0;
+        direction = gp.player.direction;
+    }
 }

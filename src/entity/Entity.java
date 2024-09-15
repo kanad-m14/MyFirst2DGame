@@ -7,7 +7,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Objects;
 
 public class Entity {
 
@@ -30,6 +29,7 @@ public class Entity {
     public boolean attacking = false;
     public boolean alive = true;
     public boolean dying = false;
+    public boolean hpBarOn = false;
 
     public Rectangle solidArea = new Rectangle(0, 0, 48, 48);
     public Rectangle attackArea = new Rectangle(0,0,0,0);
@@ -48,6 +48,7 @@ public class Entity {
     public int invincibleCounter = 0;
     public int spriteCounter = 0;
     int dyingCounter = 0;
+    int hpBarCounter = 0;
 
 
     public Entity(GamePanel gp) {
@@ -56,6 +57,8 @@ public class Entity {
     }
 
     public void setAction() {}
+
+    public void damageReaction() {}
 
     // Npc and other entities speaking method
     public void speak() {
@@ -186,8 +189,29 @@ public class Entity {
                     break;
             }
 
+            // MONSTER HP BAR
+            if(type == 2 && hpBarOn == true) {
+
+                double oneScale = (double)gp.tileSize / maxLife;
+                double hpBarValue = oneScale * life;
+
+                g2.setColor(new Color(35,35,35));
+                g2.fillRect(screenX - 1, screenY - 16, gp.tileSize + 2, 12);
+
+                g2.setColor(new Color(255, 0, 30));
+                g2.fillRect(screenX, screenY - 15, (int)hpBarValue, 10);
+
+                hpBarCounter++;
+                if(hpBarCounter > 600) {
+                    hpBarCounter = 0;
+                    hpBarOn = false;
+                }
+            }
+
             if(invincible == true) {
-                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+                hpBarOn = true;
+                hpBarCounter = 0;
+                changeAlpha(g2, 0.4f);
             }
 
             if(dying == true) {
@@ -196,7 +220,7 @@ public class Entity {
 
             g2.drawImage(image, screenX, screenY, null);
 
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+            changeAlpha(g2, 1f);
         }
     }
 

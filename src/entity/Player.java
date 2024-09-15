@@ -239,6 +239,7 @@ public class Player extends Entity{
                 gp.playSoundEffect(5);
                 gp.monster[i].life -= 1;
                 gp.monster[i].invincible = true;
+                gp.monster[i].damageReaction();
 
                 if(gp.monster[i].life <= 0) {
                     gp.monster[i].dying = true;
