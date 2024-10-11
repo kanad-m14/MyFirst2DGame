@@ -57,7 +57,7 @@ public class Player extends Entity{
         strength = 1; // The more strength he has, the more damage he gives
         dexterity = 1; // The more dexterity he has, the less damage he receives
         exp = 0;
-        nextLevelExp = 5;
+        nextLevelExp = 10;
         coin = 0;
         currentWeapon = new Sword_Normal(gp);
         currentShield = new Shield_Wood(gp);
@@ -247,8 +247,12 @@ public class Player extends Entity{
         if(i != 999) {
 
             if(invincible == false) {
-                life -= 1;
                 gp.playSoundEffect(6);
+                int damage = gp.monster[i].attack - defense;
+                if(damage < 0) {
+                    damage = 0;
+                }
+                life -= damage;
                 invincible = true;
             }
         }
@@ -261,17 +265,41 @@ public class Player extends Entity{
             if(gp.monster[i].invincible == false) {
 
                 gp.playSoundEffect(5);
-                gp.monster[i].life -= 1;
+                int damage = attack - gp.monster[i].defense;
+                if(damage < 0) {
+                    damage = 0;
+                }
+                gp.monster[i].life -= damage;
+                gp.ui.addMessage("Damage " + damage);
                 gp.monster[i].invincible = true;
                 gp.monster[i].damageReaction();
 
                 if(gp.monster[i].life <= 0) {
                     gp.monster[i].dying = true;
+                    gp.ui.addMessage("The " + gp.monster[i].name + " is killed!");
+                    gp.ui.addMessage("You have gained " + gp.monster[i].exp + " exp!");
+                    exp = exp + gp.monster[i].exp;
+                    checkLevelUp();
                 }
             }
         }
     }
 
+    public void checkLevelUp() {
+
+        if(exp >= nextLevelExp) {
+            level++;
+            nextLevelExp += nextLevelExp * 2;
+            maxLife += 2;
+            strength++;
+            dexterity++;
+            attack = getAttack();
+            defense = getDefense();
+            gp.playSoundEffect(8);
+            gp.gameState = gp.dialogueState;
+            gp.ui.currentDialogue = "You are level " + level + " now!\n";
+        }
+    }
     // draws players images when moved
     public void draw(Graphics2D g2) {
 
