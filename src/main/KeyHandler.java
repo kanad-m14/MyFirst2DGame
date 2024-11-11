@@ -6,11 +6,11 @@ import java.awt.event.KeyListener;
 public class KeyHandler implements KeyListener {
 
     // used in player class to determine the movement of player
-    public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed;
+    public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed, shotKeyPressed;
     GamePanel gp;
 
     // DEBUG
-    public boolean checkDrawTime = false;
+    public boolean showDebugText = false;
 
     public KeyHandler(GamePanel gp) {
 
@@ -102,19 +102,28 @@ public class KeyHandler implements KeyListener {
 
         if(code == KeyEvent.VK_C) {
             gp.gameState = gp.characterState;
+            gp.stopMusic();
         }
 
         if (code == KeyEvent.VK_ENTER) {
             enterPressed = true;
         }
 
+        if (code == KeyEvent.VK_F) {
+            shotKeyPressed = true;
+        }
+
         // DEBUG
         if (code == KeyEvent.VK_T) {
-            if(checkDrawTime == false) {
-                checkDrawTime = true;
-            } else if (checkDrawTime == true) {
-                checkDrawTime = false;
+            if(!showDebugText) {
+                showDebugText = true;
+            } else {
+                showDebugText = false;
             }
+        }
+
+        if (code == KeyEvent.VK_R) {
+            gp.tileM.loadMap("maps/worldV2.txt");
         }
     }
 
@@ -138,6 +147,39 @@ public class KeyHandler implements KeyListener {
 
         if(code == KeyEvent.VK_C) {
             gp.gameState = gp.playState;
+            gp.playMusic(0);
+        }
+
+        if(code == KeyEvent.VK_W) {
+            if(gp.ui.slotRow != 0) {
+                gp.ui.slotRow--;
+                gp.playSoundEffect(9);
+            }
+        }
+
+        if(code == KeyEvent.VK_A) {
+            if(gp.ui.slotCol != 0) {
+                gp.ui.slotCol--;
+                gp.playSoundEffect(9);
+            }
+        }
+
+        if(code == KeyEvent.VK_S) {
+            if(gp.ui.slotRow != 3) {
+                gp.ui.slotRow++;
+                gp.playSoundEffect(9);
+            }
+        }
+
+        if(code == KeyEvent.VK_D) {
+            if(gp.ui.slotCol != 4) {
+                gp.ui.slotCol++;
+                gp.playSoundEffect(9);
+            }
+        }
+
+        if(code == KeyEvent.VK_ENTER) {
+            gp.player.selectItem();
         }
     }
 
@@ -156,6 +198,9 @@ public class KeyHandler implements KeyListener {
         }
         if (code == KeyEvent.VK_D) {
             rightPressed = false;
+        }
+        if (code == KeyEvent.VK_F) {
+            shotKeyPressed = false;
         }
     }
 }

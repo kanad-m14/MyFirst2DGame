@@ -2,6 +2,10 @@ package main;
 
 import Monster.GreenSlime;
 import entity.NPC_OldMan;
+import objects.Axe;
+import objects.Key;
+import objects.Red_Potion;
+import objects.Shield_Blue;
 
 public class AssetSetter {
 
@@ -14,6 +18,22 @@ public class AssetSetter {
 
     // setting the position of objects on the map
     public void setObject() {
+
+        gp.obj[0] = new Key(gp);
+        gp.obj[0].worldX = gp.tileSize * 25;
+        gp.obj[0].worldY = gp.tileSize * 19;
+
+        gp.obj[1] = new Axe(gp);
+        gp.obj[1].worldX = gp.tileSize * 33;
+        gp.obj[1].worldY = gp.tileSize * 21;
+
+        gp.obj[2] = new Shield_Blue(gp);
+        gp.obj[2].worldX = gp.tileSize * 36;
+        gp.obj[2].worldY = gp.tileSize * 21;
+
+        gp.obj[3] = new Red_Potion(gp);
+        gp.obj[3].worldX = gp.tileSize * 38;
+        gp.obj[3].worldY = gp.tileSize * 14;
 
     }
 

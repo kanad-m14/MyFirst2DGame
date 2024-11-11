@@ -2,6 +2,7 @@ package main;
 
 import entity.Entity;
 import entity.Player;
+import entity.Projectile;
 import tile.TileManager;
 
 import javax.swing.*;
@@ -46,6 +47,7 @@ public class GamePanel extends JPanel implements Runnable {
     public Entity obj[] = new Entity[10]; // this represents that we can display up to 10 objects in the game
     public Entity npc[] = new Entity[10];
     public Entity monster[] = new Entity[20];
+    public ArrayList<Entity> projectileList = new ArrayList<>();
     ArrayList<Entity> entityList = new ArrayList<>();
 
     // GAME STATE
@@ -143,6 +145,18 @@ public class GamePanel extends JPanel implements Runnable {
                     }
                 }
             }
+
+            // PROJECTILE
+            for(int i = 0; i < projectileList.size(); i++) {
+                if(projectileList.get(i) != null) {
+                    if(projectileList.get(i).alive) {
+                        projectileList.get(i).update();
+                    }
+                    if(!projectileList.get(i).alive) {
+                        projectileList.remove(i);
+                    }
+                }
+            }
         }
         if(gameState == pauseState) {
             // nothing for now
@@ -156,7 +170,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         // DEBUG
         long drawStart = 0;
-        if(keyH.checkDrawTime == true) {
+        if(keyH.showDebugText == true) {
             drawStart = System.nanoTime();
         }
 
@@ -165,7 +179,6 @@ public class GamePanel extends JPanel implements Runnable {
             ui.draw(g2);
         }
         else {
-
             // TILE
             tileM.draw(g2);
 
@@ -199,6 +212,15 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
 
+            // Adding projectiles to the entity list
+            for(int i = 0; i < projectileList.size(); i++)
+            {
+                if(projectileList.get(i) != null)
+                {
+                    entityList.add(projectileList.get(i));
+                }
+            }
+
             // SORT
             Collections.sort(entityList, new Comparator<Entity>() {
                 @Override
@@ -228,12 +250,25 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         // DEBUG
-        if(keyH.checkDrawTime == true) {
+        if(keyH.showDebugText) {
             long drawEnd = System.nanoTime();
             long passed = drawEnd - drawStart;
+
+            g2.setFont(new Font("Arial", Font.PLAIN, 20));
             g2.setColor(Color.white);
-            g2.drawString("Draw Time: " + passed, 10, 400);
-            System.out.println("Draw Time: " + passed);
+            int x = 10;
+            int y = 400;
+            int lineHeight = 20;
+
+            g2.drawString("WorldX: " + player.worldX, x, y);
+            y += lineHeight;
+            g2.drawString("WorldY: " + player.worldY, x, y);
+            y += lineHeight;
+            g2.drawString("Col: " + (player.worldX + player.solidArea.x)/ tileSize, x, y);
+            y += lineHeight;
+            g2.drawString("Row: " + (player.worldY + player.solidArea.y)/ tileSize, x, y);
+            y += lineHeight;
+            g2.drawString("Draw Time: " + passed, x, y);
         }
 
         g2.dispose();
@@ -245,6 +280,7 @@ public class GamePanel extends JPanel implements Runnable {
         music.play();
         music.loop();
     }
+
     public void stopMusic() {
 
         music.stop();

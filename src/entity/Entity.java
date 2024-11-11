@@ -37,7 +37,6 @@ public class Entity {
     String dialogues[] = new String[20];
 
     // CHARACTER ATTRIBUTES
-    public int type; // 0 is player, 1 is npc, 2 is monster
     public String name;
     public int speed;
     public int maxLife;
@@ -57,14 +56,31 @@ public class Entity {
     // ITEM ATTRIBUTES:
     public int attackValue;
     public int defenseValue;
+    public String description = "";
+
+    // PROJECTILE ATTRIBUTES
+    public int maxMana;
+    public int mana;
+    public Projectile projectile;
+    public int useCost;
 
     // COUNTERS
     public int actionLockCounter = 0;
     public int invincibleCounter = 0;
     public int spriteCounter = 0;
+    public int shotAvailableCounter = 0;
     int dyingCounter = 0;
     int hpBarCounter = 0;
 
+    // TYPES
+    public int type; // 0 is player, 1 is npc, 2 is monster
+    public final int type_player = 0;
+    public final int type_npc = 1;
+    public final int type_monster = 2;
+    public final int type_sword = 3;
+    public final int type_axe = 4;
+    public final int type_shield = 5;
+    public final int type_consumable = 6;
 
     public Entity(GamePanel gp) {
 
@@ -101,6 +117,8 @@ public class Entity {
         }
     }
 
+    public void use(Entity entity) {}
+
     // updating entity's information every frame
     public void update() {
 
@@ -113,18 +131,8 @@ public class Entity {
         gp.cChecker.checkEntity(this, gp.monster);
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
 
-        if(this.type == 2 && contactPlayer == true) {
-
-            if(gp.player.invincible == false) {
-                // we can give damage
-                gp.playSoundEffect(6);
-                int damage = attack - gp.player.defense;
-                if(damage < 0) {
-                    damage = 0;
-                }
-                gp.player.life -= damage;
-                gp.player.invincible = true;
-            }
+        if(this.type == type_monster && contactPlayer == true) {
+            damagePlayer(attack);
         }
 
         // If collisionOn is false, then the NPC can move
@@ -156,6 +164,25 @@ public class Entity {
                 invincible = false;
                 invincibleCounter = 0;
             }
+        }
+
+        if(shotAvailableCounter < 30) {
+            shotAvailableCounter++;
+
+        }
+    }
+
+    public void damagePlayer(int attack) {
+
+        if(gp.player.invincible == false) {
+            // we can give damage
+            gp.playSoundEffect(6);
+            int damage = attack - gp.player.defense;
+            if(damage < 0) {
+                damage = 0;
+            }
+            gp.player.life -= damage;
+            gp.player.invincible = true;
         }
     }
 
@@ -209,7 +236,7 @@ public class Entity {
             }
 
             // MONSTER HP BAR
-            if(type == 2 && hpBarOn == true) {
+            if(type == type_monster && hpBarOn == true) {
 
                 double oneScale = (double)gp.tileSize / maxLife;
                 double hpBarValue = oneScale * life;
@@ -275,7 +302,6 @@ public class Entity {
             changeAlpha(g2, 1);
         }
         if(dyingCounter > i * 8) {
-            dying = false;
             alive = false;
         }
     }
