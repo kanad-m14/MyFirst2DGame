@@ -2,6 +2,7 @@ package main;
 
 import entity.Entity;
 import objects.Heart;
+import objects.Mana;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -14,7 +15,7 @@ public class UI {
     GamePanel gp;
     Graphics2D g2;
     Font maruMonica, purisaB;
-    BufferedImage heart_full, heart_half, heart_blank;
+    BufferedImage heart_full, heart_half, heart_blank, crystal_full, crystal_blank;
     public boolean messageOn = false;
     ArrayList<String> message = new ArrayList<>();
     ArrayList<Integer> messageCounter = new ArrayList<>();
@@ -51,6 +52,11 @@ public class UI {
         heart_full = heart.image;
         heart_half = heart.image2;
         heart_blank = heart.image3;
+
+        // MANA
+        Entity mana = new Mana(gp);
+        crystal_full = mana.image;
+        crystal_blank = mana.image2;
     }
 
     public void addMessage(String text) {
@@ -100,7 +106,7 @@ public class UI {
         int y = gp.tileSize / 2;
         int i = 0;
 
-        // DRAW MAX LIFE
+        // DRAW BLANK LIFE
         while(i < gp.player.maxLife / 2) {
             g2.drawImage(heart_blank, x, y, null);
             i++;
@@ -122,30 +128,86 @@ public class UI {
             i++;
             x += gp.tileSize;
         }
+
+        x = gp.tileSize / 2 - 5;
+        y = (int)(gp.tileSize * 2 - 1.5);
+        i = 0;
+
+        // DRAW PLAYER MANA
+        while(i < gp.player.maxMana) {
+            g2.drawImage(crystal_blank, x, y, null);
+            i++;
+            x += 35;
+        }
+
+        x = gp.tileSize / 2 - 5;
+        y = (int)(gp.tileSize * 2 - 1.5);
+        i = 0;
+
+        while (i < gp.player.mana) {
+            g2.drawImage(crystal_full, x, y, null);
+            i++;
+            x += 35;
+        }
     }
 
-    public void drawMessage() {
+//    public void drawMessage() {
+//
+//        int messageX = gp.tileSize;
+//        int messageY = gp.tileSize * 4;
+//        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
+//
+//        for(int i = 0; i < message.size(); i++) {
+//
+//            if(message.get(i) != null) {
+//
+//                g2.setColor(Color.black);
+//                g2.drawString(message.get(i), messageX + 2, messageY + 2);
+//                g2.setColor(Color.white);
+//                g2.drawString(message.get(i), messageX, messageY);
+//
+//                int counter = messageCounter.get(i) + 1; // messageCounter++
+//                messageCounter.set(i, counter); // set the counter to the array
+//                messageY += 50;
+//
+//                if(messageCounter.get(i) > 180) {
+//                    message.remove(i);
+//                    messageCounter.remove(i);
+//                }
+//            }
+//        }
+//    }
 
+    public void drawMessage() {
         int messageX = gp.tileSize;
-        int messageY = gp.tileSize * 4;
+        int messageY = gp.tileSize * 4; // Starting Y position for the first message
         g2.setFont(g2.getFont().deriveFont(Font.BOLD, 32F));
 
-        for(int i = 0; i < message.size(); i++) {
+        // Iterate through the messages
+        for (int i = 0; i < message.size(); i++) {
+            if (message.get(i) != null) {
+                // Calculate the alpha value for fading effect
+                int alpha = 255; // Fully opaque
+                if (messageCounter.get(i) > 180) {
+                    alpha = 255 - (messageCounter.get(i) - 180) * (255 / 60); // Fade out over 60 frames
+                    if (alpha < 0) {
+                        alpha = 0; // Ensure alpha doesn't go below 0
+                    }
+                }
 
-            if(message.get(i) != null) {
+                // Set the color with the calculated alpha
+                g2.setColor(new Color(255, 255, 255, alpha)); // White color with fading alpha
+                g2.drawString(message.get(i), messageX, messageY + (i * 50)); // Draw message at its position
 
-                g2.setColor(Color.black);
-                g2.drawString(message.get(i), messageX + 2, messageY + 2);
-                g2.setColor(Color.white);
-                g2.drawString(message.get(i), messageX, messageY);
-
+                // Increment the counter and update it
                 int counter = messageCounter.get(i) + 1; // messageCounter++
                 messageCounter.set(i, counter); // set the counter to the array
-                messageY += 50;
 
-                if(messageCounter.get(i) > 180) {
+                // Remove the message if the counter exceeds 240 (180 + 60 for fading out)
+                if (messageCounter.get(i) > 240) {
                     message.remove(i);
                     messageCounter.remove(i);
+                    i--; // Decrement i to account for the removed message
                 }
             }
         }
@@ -205,67 +267,147 @@ public class UI {
 
     }
 
-    public void drawPlayerMoving() {
+//    public void drawPlayerMoving() {
+//
+//        if (direction.equals("right")) {
+//            playerScreenX += speed;
+//            if (playerScreenX >= gp.screenWidth) { // Check boundary to change direction
+//                direction = "left";
+//            }
+//        }
+//        else if (direction.equals("left")) {
+//            playerScreenX -= speed;
+//            if (playerScreenX <= -gp.tileSize) { // Check boundary to change direction
+//                direction = "right";
+//            }
+//        }
+//
+//        spriteCounter++;
+//        if(spriteCounter % 15 == 0) {
+//            if(spriteNum == 1) {
+//                spriteNum = 2;
+//            }
+//            else if(spriteNum == 2) {
+//                spriteNum = 1;
+//            }
+//        }
+//
+//        gp.player.getPlayerImage();
+//        BufferedImage image = null;
+//        switch (direction) {
+//            case "left":
+//                if(spriteNum == 1) {
+//                    image = gp.player.left1;
+//                }
+//                if(spriteNum == 2) {
+//                    image = gp.player.left2;
+//                }
+//                break;
+//            case "right":
+//                if(spriteNum == 1) {
+//                    image = gp.player.right1;
+//                }
+//                if(spriteNum == 2) {
+//                    image = gp.player.right2;
+//                }
+//                break;
+//        }
+//
+//        int playerScreenY = 216;
+//        g2.drawImage(image, playerScreenX, playerScreenY, null);
+//        if(spriteCounter > 60) {
+//            spriteCounter = 0;
+//        }
+//    }
 
+    public void drawPlayerMoving() {
+        // Define constants for boundary checks and sprite timing
+        final int LEFT_BOUNDARY = -gp.tileSize;
+        final int RIGHT_BOUNDARY = gp.screenWidth;
+        final int SPRITE_CHANGE_RATE = 15;
+        final int SPRITE_RESET_LIMIT = 60;
+
+        // Move player based on direction
         if (direction.equals("right")) {
             playerScreenX += speed;
-            if (playerScreenX >= gp.screenWidth) { // Check boundary to change direction
+            if (playerScreenX >= RIGHT_BOUNDARY) {
                 direction = "left";
             }
-        }
-        else if (direction.equals("left")) {
+        } else if (direction.equals("left")) {
             playerScreenX -= speed;
-            if (playerScreenX <= -gp.tileSize) { // Check boundary to change direction
+            if (playerScreenX <= LEFT_BOUNDARY) {
                 direction = "right";
             }
         }
 
+        // Update sprite counter and toggle sprite number
         spriteCounter++;
-        if(spriteCounter % 15 == 0) {
-            if(spriteNum == 1) {
-                spriteNum = 2;
-            }
-            else if(spriteNum == 2) {
-                spriteNum = 1;
-            }
+        if (spriteCounter % SPRITE_CHANGE_RATE == 0) {
+            spriteNum = (spriteNum == 1) ? 2 : 1; // Toggle spriteNum
         }
 
-        gp.player.getPlayerImage();
+        // Select the appropriate image based on direction and spriteNum
         BufferedImage image = null;
-        switch (direction) {
-            case "left":
-                if(spriteNum == 1) {
-                    image = gp.player.left1;
-                }
-                if(spriteNum == 2) {
-                    image = gp.player.left2;
-                }
-                break;
-            case "right":
-                if(spriteNum == 1) {
-                    image = gp.player.right1;
-                }
-                if(spriteNum == 2) {
-                    image = gp.player.right2;
-                }
-                break;
+        if (direction.equals("left")) {
+            image = (spriteNum == 1) ? gp.player.left1 : gp.player.left2;
+        } else if (direction.equals("right")) {
+            image = (spriteNum == 1) ? gp.player.right1 : gp.player.right2;
         }
 
+        // Draw the player image at the specified Y position
         int playerScreenY = 216;
         g2.drawImage(image, playerScreenX, playerScreenY, null);
-        if(spriteCounter > 60) {
+
+        // Reset spriteCounter if it exceeds the limit
+        if (spriteCounter > SPRITE_RESET_LIMIT) {
             spriteCounter = 0;
         }
     }
 
-    public void drawPauseScreen() {
+//    public void drawPauseScreen() {
+//
+//        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 80f));
+//        String text = "PAUSED";
+//        int x = getXforCenteredText(text);
+//        int y = gp.screenHeight/2;
+//
+//        g2.drawString(text, x, y);
+//    }
 
+    public void drawPauseScreen() {
+        // Draw a semi-transparent dark overlay
+        g2.setColor(new Color(0, 0, 0, 150)); // Black with 150 alpha for transparency
+        g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+
+        // Draw a decorative border (optional)
+        g2.setColor(Color.white);
+        g2.drawRect(50, 50, gp.screenWidth - 100, gp.screenHeight - 100); // Simple border
+
+        // Set font for the pause text
         g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 80f));
         String text = "PAUSED";
         int x = getXforCenteredText(text);
-        int y = gp.screenHeight/2;
+        int y = gp.screenHeight / 2 - 50; // Slightly above center
 
+        // Draw the pause text
+        g2.setColor(Color.white);
         g2.drawString(text, x, y);
+
+        // Set font for additional instructions
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40f));
+        String resumeText = "Press 'ESC' to Resume";
+        x = getXforCenteredText(resumeText);
+        int yInstructions = y + 60; // Position below the pause text
+        g2.drawString(resumeText, x, yInstructions);
+
+        // Optionally, add more instructions
+        String menuText = "Press 'M' for Menu";
+        x = getXforCenteredText(menuText);
+        int yMenu = yInstructions + 40; // Position below the resume text
+        g2.drawString(menuText, x, yMenu);
+
+        // Optionally, you can add some pixel art or decorative elements here
+        // For example: g2.drawImage(pixelArtImage, xPosition, yPosition, null);
     }
 
     public void drawDialogueScreen() {
@@ -286,6 +428,7 @@ public class UI {
             g2.drawString(line, x, y);
             y += 40;
         }
+
     }
 
     public void drawCharacterScreen() {
@@ -310,6 +453,8 @@ public class UI {
         textY += lineHeight;
         g2.drawString("Life", textX, textY);
         textY += lineHeight;
+        g2.drawString("Mana", textX, textY);
+        textY += lineHeight;
         g2.drawString("Strength", textX, textY);
         textY += lineHeight;
         g2.drawString("Dexterity", textX, textY);
@@ -319,8 +464,6 @@ public class UI {
         g2.drawString("Defense", textX, textY);
         textY += lineHeight;
         g2.drawString("Exp", textX, textY);
-        textY += lineHeight;
-        g2.drawString("Next Level", textX, textY);
         textY += lineHeight;
         g2.drawString("Coin", textX, textY);
         textY += lineHeight + 15;
@@ -339,6 +482,11 @@ public class UI {
         textY += lineHeight;
 
         value = String.valueOf(gp.player.life + "/" + gp.player.maxLife);
+        textX = getXforAlignToRightText(value, tailX);
+        g2.drawString(value, textX, textY);
+        textY += lineHeight;
+
+        value = String.valueOf(gp.player.mana + "/" + gp.player.maxMana);
         textX = getXforAlignToRightText(value, tailX);
         g2.drawString(value, textX, textY);
         textY += lineHeight;
@@ -363,12 +511,7 @@ public class UI {
         g2.drawString(value, textX, textY);
         textY += lineHeight;
 
-        value = String.valueOf(gp.player.exp);
-        textX = getXforAlignToRightText(value, tailX);
-        g2.drawString(value, textX, textY);
-        textY += lineHeight;
-
-        value = String.valueOf(gp.player.nextLevelExp);
+        value = String.valueOf(gp.player.exp + "/" + gp.player.nextLevelExp);
         textX = getXforAlignToRightText(value, tailX);
         g2.drawString(value, textX, textY);
         textY += lineHeight;
@@ -472,6 +615,7 @@ public class UI {
         int itemIndex = slotCol + (slotRow * 5);
         return itemIndex;
     }
+
     public void drawSubWindow(int x, int y, int width, int height) {
 
         Color c = new Color(0, 0,0, 210); // a determines the transparency/ opacity

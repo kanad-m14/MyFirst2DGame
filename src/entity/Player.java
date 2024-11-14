@@ -55,6 +55,8 @@ public class Player extends Entity{
         // PLAYER STATUS
         maxLife = 6;
         life = maxLife;
+        maxMana = 4;
+        mana = maxMana;
         level = 1;
         strength = 1; // The more strength he has, the more damage he gives
         dexterity = 1; // The more dexterity he has, the less damage he receives
@@ -191,9 +193,10 @@ public class Player extends Entity{
             }
         }
 
-        if(gp.keyH.shotKeyPressed && !projectile.alive && shotAvailableCounter == 30) {
+        if(gp.keyH.shotKeyPressed && !projectile.alive && shotAvailableCounter == 30 && projectile.haveEnoughResource(this)) {
 
             projectile.set(worldX, worldY, direction, true, this);
+            projectile.subtractResource(this);
             gp.projectileList.add(projectile);
             shotAvailableCounter = 0;
             gp.playSoundEffect(10);
@@ -288,6 +291,7 @@ public class Player extends Entity{
             if(i != 999) {
                 attackCanceled = true;
                 gp.gameState = gp.dialogueState;
+                gp.pauseMusic();
                 gp.npc[i].speak();
             }
         }
@@ -472,20 +476,20 @@ public class Player extends Entity{
 
         // DEBUG
         // AttackArea
-        tempScreenX = screenX + solidArea.x;
-        tempScreenY = screenY + solidArea.y;
-        switch(direction) {
-
-            case "up": tempScreenY = screenY - attackArea.height; break;
-            case "down": tempScreenY = screenY + gp.tileSize; break;
-            case "left": tempScreenX = screenX - attackArea.width; break;
-            case "right": tempScreenX = screenX + gp.tileSize; break;
-        }
-
-        g2.setColor(Color.red);
-        g2.setStroke(new BasicStroke(1));
-
-        g2.drawRect(tempScreenX, tempScreenY, attackArea.width, attackArea.height);
+//        tempScreenX = screenX + solidArea.x;
+//        tempScreenY = screenY + solidArea.y;
+//        switch(direction) {
+//
+//            case "up": tempScreenY = screenY - attackArea.height; break;
+//            case "down": tempScreenY = screenY + gp.tileSize; break;
+//            case "left": tempScreenX = screenX - attackArea.width; break;
+//            case "right": tempScreenX = screenX + gp.tileSize; break;
+//        }
+//
+//        g2.setColor(Color.red);
+//        g2.setStroke(new BasicStroke(1));
+//
+//        g2.drawRect(tempScreenX, tempScreenY, attackArea.width, attackArea.height);
     }
 }
 

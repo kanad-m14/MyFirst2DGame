@@ -282,7 +282,6 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void stopMusic() {
-
         music.stop();
     }
 
@@ -290,5 +289,13 @@ public class GamePanel extends JPanel implements Runnable {
 
         soundEffect.setFile(i);
         soundEffect.play();
+    }
+
+    public void pauseMusic() {
+        music.pause();
+    }
+
+    public void resumeMusic() {
+        music.resume();
     }
 }

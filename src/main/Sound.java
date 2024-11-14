@@ -9,6 +9,8 @@ public class Sound {
 
     Clip clip;
     URL soundURL[] = new URL[30];
+    private long clipPosition; // To store the position of the clip when paused
+    private boolean isPlaying; // To track if the clip is currently playing
 
     public Sound() {
 
@@ -31,6 +33,7 @@ public class Sound {
             AudioInputStream AudioInputStream = AudioSystem.getAudioInputStream(soundURL[i]);
             clip = AudioSystem.getClip();
             clip.open(AudioInputStream);
+            isPlaying = false;
 
         }catch (Exception e) {
 
@@ -40,16 +43,38 @@ public class Sound {
     public void play() {
 
         clip.start();
+        isPlaying = true;
 
     }
 
     public void loop() {
 
         clip.loop(Clip.LOOP_CONTINUOUSLY);
+        isPlaying = true;
     }
 
     public void stop() {
 
         clip.stop();
+        isPlaying = false;
+        clipPosition = 0;
+    }
+
+    public void pause() {
+
+        if (isPlaying) {
+            clipPosition = clip.getMicrosecondPosition(); // Store the current position
+            clip.stop(); // Stop the clip
+            isPlaying = false; // Update playing state
+        }
+    }
+
+    public void resume() {
+
+        if (!isPlaying) {
+            clip.setMicrosecondPosition(clipPosition); // Set the clip position to the last position
+            clip.start(); // Start the clip
+            isPlaying = true; // Update playing state
+        }
     }
 }
