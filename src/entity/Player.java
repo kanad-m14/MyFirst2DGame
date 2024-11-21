@@ -2,13 +2,13 @@ package entity;
 
 import main.GamePanel;
 import main.KeyHandler;
-import objects.Fireball;
-import objects.Shield_Wood;
-import objects.Sword_Normal;
+import objects.*;
+import tile_interactive.Trunk;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Player extends Entity{
 
@@ -61,19 +61,37 @@ public class Player extends Entity{
         strength = 1; // The more strength he has, the more damage he gives
         dexterity = 1; // The more dexterity he has, the less damage he receives
         exp = 0;
-        nextLevelExp = 10;
+        nextLevelExp = 4;
         coin = 0;
         currentWeapon = new Sword_Normal(gp);
         currentShield = new Shield_Wood(gp);
         projectile = new Fireball(gp);
         attack = getAttack(); // The total attack value is decided by the strength and weapon
         defense = getDefense(); // The total defense value is decided by dexterity and shield
+        invincible = false;
+    }
+
+    public void setDefaultPositions() {
+
+        worldX = gp.tileSize * 23;
+        worldY = gp.tileSize * 21;
+        direction = "down";
+        invincible = false;
+    }
+
+    public void restoreLifeAndMana() {
+
+        life = maxLife;
+        mana = maxMana;
+        invincible = false;
     }
 
     public void setItems() {
 
+        inventory.clear();
         inventory.add(currentWeapon);
         inventory.add(currentShield);
+        inventory.add(new Axe(gp));
     }
 
     public int getAttack() {
@@ -158,6 +176,9 @@ public class Player extends Entity{
             int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
             contactMonster(monsterIndex);
 
+            // CHECK INTERACTIVE TILE COLLISION
+            gp.cChecker.checkEntity(this, gp.iTile);
+
             // CHECK EVENT
             gp.eventHandler.checkEvent();
 
@@ -191,6 +212,7 @@ public class Player extends Entity{
                 }
                 spriteCounter = 0;
             }
+
         }
 
         if(gp.keyH.shotKeyPressed && !projectile.alive && shotAvailableCounter == 30 && projectile.haveEnoughResource(this)) {
@@ -213,6 +235,21 @@ public class Player extends Entity{
 
         if(shotAvailableCounter < 30) {
             shotAvailableCounter++;
+        }
+
+        if(life > maxLife) {
+            life = maxLife;
+        }
+
+        if(mana > maxMana) {
+            mana = maxMana;
+        }
+
+        if(life <= 0) {
+            gp.gameState = gp.gameOverState;
+            gp.ui.commandEndNum = -1;
+            gp.stopMusic();
+            gp.playSoundEffect(12);
         }
     }
 
@@ -242,12 +279,15 @@ public class Player extends Entity{
             }
 
             // Attack area becomes solid area
-            solidArea.width = attackArea.width;
+            solidArea.width = attackArea.width - 10;
             solidArea.height = attackArea.height;
 
             // Check monster collision with updated worldX and worldY and solidArea
             int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
             damageMonster(monsterIndex, attack);
+
+            int iTileIndex = gp.cChecker.checkEntity(this, gp.iTile);
+            damageInteractiveTile(iTileIndex);
 
             worldX = currentWorldX;
             worldY = currentWorldY;
@@ -267,19 +307,39 @@ public class Player extends Entity{
 
         if(i != 999)
         {
-            String text;
-            if(inventory.size() != maxInventorySize)
-            {
-                inventory.add(gp.obj[i]);
-                gp.playSoundEffect(1);
-                text = "Got a " + gp.obj[i].name + "!";
+            // Pickup Only Items
+            if(gp.obj[i].type == type_pickUpOnly) {
+
+                gp.obj[i].use(this);
+                gp.obj[i] = null;
             }
-            else
-            {
-                text = "Inventory is full!";
+            else if(gp.obj[i].type == type_obstacle) {
+                if(keyH.enterPressed) {
+                    attackCanceled = true;
+                    gp.obj[i].interact();
+                }
             }
-            gp.ui.addMessage(text);
-            gp.obj[i] = null;
+            else if(gp.obj[i].type == type_gameEnd) {
+                gp.gameState = gp.gameEndState;
+                gp.stopMusic();
+                gp.playSoundEffect(4);
+            }
+            // Inventory Items
+            else {
+                String text;
+                if(inventory.size() != maxInventorySize)
+                {
+                    inventory.add(gp.obj[i]);
+                    gp.playSoundEffect(1);
+                    text = "Got a " + gp.obj[i].name + "!";
+                }
+                else
+                {
+                    text = "Inventory is full!";
+                }
+                gp.ui.addMessage(text);
+                gp.obj[i] = null;
+            }
         }
     }
 
@@ -291,7 +351,7 @@ public class Player extends Entity{
             if(i != 999) {
                 attackCanceled = true;
                 gp.gameState = gp.dialogueState;
-                gp.pauseMusic();
+//                gp.pauseMusic();
                 gp.npc[i].speak();
             }
         }
@@ -340,6 +400,20 @@ public class Player extends Entity{
         }
     }
 
+    public void damageInteractiveTile(int i) {
+
+        if(i != 999 && gp.iTile[i].destructible && gp.iTile[i].isCorrectItem(this) && !gp.iTile[i].invincible) {
+
+            gp.iTile[i].playSoundEffect();
+            gp.iTile[i].life--;
+            gp.iTile[i].invincible = true;
+
+            if(gp.iTile[i].life == 0) {
+                gp.iTile[i] = gp.iTile[i].getDestroyedForm();
+            }
+        }
+    }
+
     public void checkLevelUp() {
 
         if(exp >= nextLevelExp) {
@@ -376,8 +450,11 @@ public class Player extends Entity{
 
             if(selectedItem.type == type_consumable) {
 
-                selectedItem.use(this);
-                inventory.remove(item_index);
+                boolean status = selectedItem.use(this);
+
+                if(status == true) {
+                    inventory.remove(item_index);
+                }
             }
         }
     }
@@ -492,17 +569,3 @@ public class Player extends Entity{
 //        g2.drawRect(tempScreenX, tempScreenY, attackArea.width, attackArea.height);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

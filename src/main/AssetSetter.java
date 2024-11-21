@@ -2,10 +2,11 @@ package main;
 
 import Monster.GreenSlime;
 import entity.NPC_OldMan;
-import objects.Axe;
-import objects.Key;
-import objects.Red_Potion;
-import objects.Shield_Blue;
+import objects.*;
+import tile_interactive.DryTree;
+import tile_interactive.InteractiveTile;
+
+import java.util.Arrays;
 
 public class AssetSetter {
 
@@ -19,22 +20,32 @@ public class AssetSetter {
     // setting the position of objects on the map
     public void setObject() {
 
-        gp.obj[0] = new Key(gp);
-        gp.obj[0].worldX = gp.tileSize * 25;
-        gp.obj[0].worldY = gp.tileSize * 19;
+        Arrays.fill(gp.obj, null);
 
-        gp.obj[1] = new Axe(gp);
-        gp.obj[1].worldX = gp.tileSize * 33;
-        gp.obj[1].worldY = gp.tileSize * 21;
+        int i = 0;
+        gp.obj[i] = new Axe(gp);
+        gp.obj[i].worldX = gp.tileSize * 33;
+        gp.obj[i].worldY = gp.tileSize * 7;
+        i++;
 
-        gp.obj[2] = new Shield_Blue(gp);
-        gp.obj[2].worldX = gp.tileSize * 36;
-        gp.obj[2].worldY = gp.tileSize * 21;
+        gp.obj[i] = new Door(gp);
+        gp.obj[i].worldX = gp.tileSize * 10;
+        gp.obj[i].worldY = gp.tileSize * 12;
+        i++;
 
-        gp.obj[3] = new Red_Potion(gp);
-        gp.obj[3].worldX = gp.tileSize * 38;
-        gp.obj[3].worldY = gp.tileSize * 14;
+        gp.obj[i] = new Chest(gp, new Key(gp));
+        gp.obj[i].worldX = gp.tileSize * 30;
+        gp.obj[i].worldY = gp.tileSize * 28;
+        i++;
 
+        gp.obj[i] = new BlueHeart(gp);
+        gp.obj[i].worldX = gp.tileSize * 10;
+        gp.obj[i].worldY = gp.tileSize * 9;
+        i++;
+
+        gp.obj[i] = new Chest(gp, new Red_Potion(gp));
+        gp.obj[i].worldX = gp.tileSize * 14;
+        gp.obj[i].worldY = gp.tileSize * 39;
     }
 
     // setting position of the npc at the start of the game
@@ -48,26 +59,105 @@ public class AssetSetter {
 
     public void setMonster() {
 
-        gp.monster[0] = new GreenSlime(gp);
-        gp.monster[0].worldX = gp.tileSize * 23;
-        gp.monster[0].worldY = gp.tileSize * 36;
+        int i = 0;
 
-        gp.monster[1] = new GreenSlime(gp);
-        gp.monster[1].worldX = gp.tileSize * 23;
-        gp.monster[1].worldY = gp.tileSize * 37;
+        gp.monster[i] = new GreenSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 23;
+        gp.monster[i].worldY = gp.tileSize * 36;
+        i++;
 
-        gp.monster[2] = new GreenSlime(gp);
-        gp.monster[2].worldX = gp.tileSize * 34;
-        gp.monster[2].worldY = gp.tileSize * 42;
+        gp.monster[i] = new GreenSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 23;
+        gp.monster[i].worldY = gp.tileSize * 37;
+        i++;
 
-        gp.monster[3] = new GreenSlime(gp);
-        gp.monster[3].worldX = gp.tileSize * 38;
-        gp.monster[3].worldY = gp.tileSize * 41;
+        gp.monster[i] = new GreenSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 34;
+        gp.monster[i].worldY = gp.tileSize * 42;
+        i++;
 
-        gp.monster[4] = new GreenSlime(gp);
-        gp.monster[4].worldX = gp.tileSize * 23;
-        gp.monster[4].worldY = gp.tileSize * 40;
+        gp.monster[i] = new GreenSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 38;
+        gp.monster[i].worldY = gp.tileSize * 41;
+        i++;
 
+        gp.monster[i] = new GreenSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 23;
+        gp.monster[i].worldY = gp.tileSize * 40;
+        i++;
+
+        gp.monster[i] = new GreenSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 34;
+        gp.monster[i].worldY = gp.tileSize * 8;
+        i++;
+
+        gp.monster[i] = new GreenSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 39;
+        gp.monster[i].worldY = gp.tileSize * 7;
+        i++;
+
+        gp.monster[i] = new GreenSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 41;
+        gp.monster[i].worldY = gp.tileSize * 12;
+        i++;
+
+//        gp.monster[i] = new GreenSlime(gp);
+//        gp.monster[i].worldX = gp.tileSize * 9;
+//        gp.monster[i].worldY = gp.tileSize * 30;
+//        i++;
+//
+//        gp.monster[i] = new GreenSlime(gp);
+//        gp.monster[i].worldX = gp.tileSize * 11;
+//        gp.monster[i].worldY = gp.tileSize * 33;
+//        i++;
+//
+//        gp.monster[i] = new GreenSlime(gp);
+//        gp.monster[i].worldX = gp.tileSize * 14;
+//        gp.monster[i].worldY = gp.tileSize * 32;
+//        i++;
+
+        gp.monster[i] = new GreenSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 12;
+        gp.monster[i].worldY = gp.tileSize * 29;
+        i++;
+
+        gp.monster[i] = new GreenSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 32;
+        gp.monster[i].worldY = gp.tileSize * 21;
+        i++;
+
+        gp.monster[i] = new GreenSlime(gp);
+        gp.monster[i].worldX = gp.tileSize * 38;
+        gp.monster[i].worldY = gp.tileSize * 25;
+        i++;
+    }
+
+    public void setInteractiveTile() {
+
+        int i = 0;
+        gp.iTile[i] = new DryTree(gp, 27, 12); i++;
+        gp.iTile[i] = new DryTree(gp, 28, 12); i++;
+        gp.iTile[i] = new DryTree(gp, 29, 12); i++;
+        gp.iTile[i] = new DryTree(gp, 30, 12); i++;
+        gp.iTile[i] = new DryTree(gp, 31, 12); i++;
+        gp.iTile[i] = new DryTree(gp, 32, 12); i++;
+        gp.iTile[i] = new DryTree(gp, 33, 12); i++;
+        gp.iTile[i] = new DryTree(gp, 29, 20); i++;
+        gp.iTile[i] = new DryTree(gp, 29, 21); i++;
+        gp.iTile[i] = new DryTree(gp, 29, 22); i++;
+        gp.iTile[i] = new DryTree(gp, 25, 29); i++;
+        gp.iTile[i] = new DryTree(gp, 26, 29); i++;
+        gp.iTile[i] = new DryTree(gp, 26, 30); i++;
+        gp.iTile[i] = new DryTree(gp, 26, 31); i++;
+        gp.iTile[i] = new DryTree(gp, 27, 31); i++;
+        gp.iTile[i] = new DryTree(gp, 28, 31); i++;
+        gp.iTile[i] = new DryTree(gp, 28, 30); i++;
+        gp.iTile[i] = new DryTree(gp, 14, 28); i++;
+        gp.iTile[i] = new DryTree(gp, 14, 40); i++;
+        gp.iTile[i] = new DryTree(gp, 15, 40); i++;
+        gp.iTile[i] = new DryTree(gp, 16, 40); i++;
+        gp.iTile[i] = new DryTree(gp, 17, 40); i++;
+        gp.iTile[i] = new DryTree(gp, 8, 28); i++;
 
     }
 }

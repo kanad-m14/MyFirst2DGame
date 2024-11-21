@@ -54,6 +54,7 @@ public class Entity {
     public Entity currentShield;
 
     // ITEM ATTRIBUTES:
+    public int value;
     public int attackValue;
     public int defenseValue;
     public String description = "";
@@ -81,15 +82,61 @@ public class Entity {
     public final int type_axe = 4;
     public final int type_shield = 5;
     public final int type_consumable = 6;
+    public final int type_pickUpOnly = 7;
+    public final int type_obstacle = 8;
+    public final int type_gameEnd = 9;
 
     public Entity(GamePanel gp) {
 
         this.gp = gp;
     }
 
+    public int getLeftX() {
+        return worldX + solidArea.x;
+    }
+
+    public int getRightX() {
+        return worldX + solidArea.x + solidArea.width;
+    }
+
+    public int getTopY() {
+        return worldY + solidArea.y;
+    }
+
+    public int getBottomY() {
+        return worldY + solidArea.y + solidArea.height;
+    }
+
+    public int getCol() {
+        return (worldX + solidArea.x)/gp.tileSize;
+    }
+
+    public int getRow() {
+        return (worldY + solidArea.y)/gp.tileSize;
+    }
+
     public void setAction() {}
 
     public void damageReaction() {}
+
+    public boolean use(Entity entity) {
+        return false;
+    }
+
+    public void checkDrop() {}
+
+    public void dropItem(Entity droppedItem) {
+
+        for(int i = 0; i < gp.obj.length; i++) {
+
+            if(gp.obj[i] == null) {
+                gp.obj[i] = droppedItem;
+                gp.obj[i].worldX = worldX; // dead monster's worldX and worldY
+                gp.obj[i].worldY = worldY;
+                break;
+            }
+        }
+    }
 
     // Npc and other entities speaking method
     public void speak() {
@@ -117,7 +164,36 @@ public class Entity {
         }
     }
 
-    public void use(Entity entity) {}
+    public void interact() {}
+
+    public int getDetected(Entity user, Entity target[], String targetName) {
+        int index = 999;
+
+        // Check the surrounding objects
+        int nextWorldX = user.getLeftX();
+        int nextWorldY = user.getTopY();
+
+        switch(user.direction) {
+            case "up": nextWorldY = user.getTopY() - user.speed; break;    // change 1 to user.speed
+            case "down": nextWorldY = user.getBottomY() + user.speed; break;    // change 1 to user.speed
+            case "left": nextWorldX = user.getLeftX() - user.speed; break;    // change 1 to user.speed
+            case "right": nextWorldX = user.getRightX() + user.speed; break;    // change 1 to user.speed
+        }
+
+        int col = nextWorldX / gp.tileSize;
+        int row = nextWorldY / gp.tileSize;
+
+        for(int i = 0; i < target.length; i++) {
+            if(target[i] != null) {
+                if(target[i].getCol() == col && target[i].getRow() == row && target[i].name.equals(targetName)) {
+                    index = i;
+                    break;
+                }
+            }
+        }
+
+        return index;
+    }
 
     // updating entity's information every frame
     public void update() {
@@ -126,6 +202,7 @@ public class Entity {
 
         collisionOn = false;
         gp.cChecker.checkTile(this);
+        gp.cChecker.checkEntity(this, gp.iTile);
         gp.cChecker.checkObject(this, false);
         gp.cChecker.checkEntity(this, gp.npc);
         gp.cChecker.checkEntity(this, gp.monster);
@@ -177,7 +254,7 @@ public class Entity {
         if(gp.player.invincible == false) {
             // we can give damage
             gp.playSoundEffect(6);
-            int damage = attack - gp.player.defense;
+            int damage = attack * 2 - gp.player.defense;
             if(damage < 0) {
                 damage = 0;
             }
